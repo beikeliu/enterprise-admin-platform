@@ -386,6 +386,21 @@ body {
   font-size: 12px;
 }
 
+.comment-composer {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.comment-composer-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .panel {
   background: #fff;
   border: 1px solid #e5e7eb;

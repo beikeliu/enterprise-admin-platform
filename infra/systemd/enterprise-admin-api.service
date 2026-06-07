@@ -1,0 +1,17 @@
+[Unit]
+Description=Enterprise Admin API
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/enterprise-admin-platform
+Environment=NODE_ENV=production
+EnvironmentFile=/opt/enterprise-admin-platform/.env
+ExecStart=/usr/bin/node /opt/enterprise-admin-platform/apps/admin-api/dist/main.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,362 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users       User[]
+  departments Department[]
+  roles       Role[]
+  menus       Menu[]
+  tickets     Ticket[]
+  dictTypes   DictType[]
+  featureFlags FeatureFlag[]
+  notifications Notification[]
+  files       FileAsset[]
+}
+
+model User {
+  id           String    @id @default(uuid())
+  tenantId     String
+  username     String
+  displayName  String
+  email        String?
+  phone        String?
+  passwordHash String
+  status       String    @default("active")
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+  version      Int       @default(1)
+
+  tenant      Tenant     @relation(fields: [tenantId], references: [id])
+  departmentId String?
+  department  Department? @relation(fields: [departmentId], references: [id])
+  roles       UserRole[]
+  tickets     Ticket[]
+  auditLogs   AuditLog[]
+  notifications Notification[]
+  files       FileAsset[]
+
+  @@unique([tenantId, username])
+}
+
+model Department {
+  id        String    @id @default(uuid())
+  tenantId  String
+  parentId  String?
+  name      String
+  code      String
+  path      String
+  sortOrder Int       @default(0)
+  status    String    @default("active")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  tenant  Tenant @relation(fields: [tenantId], references: [id])
+  users   User[]
+  tickets Ticket[]
+
+  @@unique([tenantId, code])
+}
+
+model Role {
+  id          String    @id @default(uuid())
+  tenantId    String
+  name        String
+  code        String
+  description String?
+  status      String    @default("active")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  tenant      Tenant @relation(fields: [tenantId], references: [id])
+  users       UserRole[]
+  permissions RolePermission[]
+
+  @@unique([tenantId, code])
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  resource    String
+  action      String
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles RolePermission[]
+}
+
+model UserRole {
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model Menu {
+  id             String   @id @default(uuid())
+  tenantId       String
+  parentId       String?
+  name           String
+  routePath      String?
+  componentKey   String?
+  icon           String?
+  permissionCode String?
+  sortOrder      Int      @default(0)
+  visible        Boolean  @default(true)
+  status         String   @default("active")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, routePath])
+}
+
+model WorkflowTemplate {
+  id           String   @id @default(uuid())
+  tenantId     String
+  name         String
+  code         String
+  resourceType String
+  version      Int      @default(1)
+  status       String   @default("draft")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  nodes     WorkflowNode[]
+  edges     WorkflowEdge[]
+  instances WorkflowInstance[]
+
+  @@unique([tenantId, code, version])
+}
+
+model WorkflowNode {
+  id              String  @id @default(uuid())
+  templateId      String
+  nodeKey         String
+  nodeType        String
+  name            String
+  assigneeType    String?
+  assigneeConfig  Json?
+  conditionConfig Json?
+  sortOrder       Int     @default(0)
+
+  template WorkflowTemplate @relation(fields: [templateId], references: [id])
+}
+
+model WorkflowEdge {
+  id              String @id @default(uuid())
+  templateId      String
+  sourceNodeKey   String
+  targetNodeKey   String
+  conditionConfig Json?
+
+  template WorkflowTemplate @relation(fields: [templateId], references: [id])
+}
+
+model WorkflowInstance {
+  id             String    @id @default(uuid())
+  tenantId       String
+  templateId     String
+  resourceType   String
+  resourceId     String
+  status         String
+  currentNodeKey String?
+  startedBy      String
+  startedAt      DateTime  @default(now())
+  completedAt    DateTime?
+
+  template WorkflowTemplate @relation(fields: [templateId], references: [id])
+  tasks    WorkflowTask[]
+  records  WorkflowRecord[]
+}
+
+model WorkflowTask {
+  id          String    @id @default(uuid())
+  instanceId  String
+  nodeKey     String
+  assigneeId  String
+  status      String    @default("pending")
+  dueAt       DateTime?
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  instance WorkflowInstance @relation(fields: [instanceId], references: [id])
+  records  WorkflowRecord[]
+}
+
+model WorkflowRecord {
+  id         String   @id @default(uuid())
+  instanceId String
+  taskId     String?
+  action     String
+  operatorId String
+  comment    String?
+  snapshot   Json?
+  createdAt  DateTime @default(now())
+
+  instance WorkflowInstance @relation(fields: [instanceId], references: [id])
+  task     WorkflowTask?    @relation(fields: [taskId], references: [id])
+}
+
+model Ticket {
+  id                 String    @id @default(uuid())
+  tenantId           String
+  title              String
+  type               String
+  priority           String
+  status             String
+  applicantId        String
+  departmentId       String?
+  description        String?
+  formData           Json      @default("{}")
+  workflowInstanceId String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  version            Int       @default(1)
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  applicant  User        @relation(fields: [applicantId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+  comments   TicketComment[]
+}
+
+model TicketComment {
+  id        String   @id @default(uuid())
+  ticketId  String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  tenantId   String
+  actorId    String?
+  action     String
+  resource   String
+  resourceId String?
+  detail     Json?
+  ip         String?
+  userAgent  String?
+  traceId    String
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+}
+
+model DictType {
+  id          String    @id @default(uuid())
+  tenantId    String
+  name        String
+  code        String
+  description String?
+  status      String    @default("active")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  items  DictItem[]
+
+  @@unique([tenantId, code])
+}
+
+model DictItem {
+  id        String    @id @default(uuid())
+  typeId    String
+  label     String
+  value     String
+  color     String?
+  sortOrder Int       @default(0)
+  status    String    @default("active")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  type DictType @relation(fields: [typeId], references: [id])
+
+  @@unique([typeId, value])
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  code        String
+  description String?
+  enabled     Boolean  @default(false)
+  rules       Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, code])
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  tenantId  String
+  userId    String?
+  title     String
+  content   String
+  level     String    @default("info")
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User?  @relation(fields: [userId], references: [id])
+}
+
+model FileAsset {
+  id          String   @id @default(uuid())
+  tenantId    String
+  uploaderId  String?
+  name        String
+  mimeType    String
+  size        Int
+  url         String
+  visibility  String   @default("private")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  uploader User?  @relation(fields: [uploaderId], references: [id])
+}

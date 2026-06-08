@@ -1,6 +1,7 @@
 import { Layout, Menu, Button, Avatar, Space, Breadcrumb } from 'antd';
 import {
   ClipboardList,
+  Github,
   GitPullRequest,
   LayoutDashboard,
   LogOut,
@@ -66,6 +67,13 @@ export function AdminLayout() {
             <strong>企业级运营管理平台</strong>
           </div>
           <Space>
+            <Button
+              icon={<Github size={16} />}
+              href="https://github.com/beikeliu/enterprise-admin-platform"
+              target="_blank"
+            >
+              GitHub
+            </Button>
             <Avatar>{user?.displayName.slice(0, 1)}</Avatar>
             <span>{user?.displayName}</span>
             <Button

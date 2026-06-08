@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 type UserRow = {
   id: string;
@@ -87,6 +88,7 @@ export function UsersPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={(data as { items?: UserRow[] } | undefined)?.items ?? []}
+            scroll={tableScroll()}
             columns={[
               { title: '账号', dataIndex: 'username' },
               { title: '姓名', dataIndex: 'displayName' },

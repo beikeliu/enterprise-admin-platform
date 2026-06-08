@@ -2,6 +2,7 @@ import { Descriptions, Space, Table, Tag } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { WorkflowGraph } from '@/components/workflow/WorkflowGraph';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 type WorkflowTemplateRow = {
   id: string;
@@ -42,6 +43,7 @@ export function WorkflowTemplatesPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={data?.items ?? []}
+            scroll={tableScroll()}
             expandable={{
               expandedRowRender: (record: WorkflowTemplateRow) => (
                 <div className="workflow-template-detail">

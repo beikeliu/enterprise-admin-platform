@@ -3,6 +3,7 @@ import { Progress, Space, Table, Tag } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { api } from '@/lib/api';
+import { compactTableScroll } from '@/lib/table-scroll';
 
 type DistributionRow = {
   name: string;
@@ -128,6 +129,7 @@ export function OperationsReportPage() {
                 title={() => '工单状态明细'}
                 loading={isLoading}
                 dataSource={data?.ticketStatus ?? []}
+                scroll={compactTableScroll}
                 pagination={false}
                 columns={[
                   {
@@ -151,6 +153,7 @@ export function OperationsReportPage() {
                 title={() => '申请人排行'}
                 loading={isLoading}
                 dataSource={data?.applicantRanking ?? []}
+                scroll={compactTableScroll}
                 pagination={false}
                 columns={[
                   { title: '申请人', dataIndex: 'name' },

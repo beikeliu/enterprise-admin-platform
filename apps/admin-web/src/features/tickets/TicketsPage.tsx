@@ -3,6 +3,7 @@ import { Plus, Send } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 const statusColor: Record<string, string> = {
   draft: 'default',
@@ -57,6 +58,7 @@ export function TicketsPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={data?.items ?? []}
+            scroll={tableScroll()}
             pagination={{ total: data?.total, pageSize: data?.pageSize ?? 20 }}
             columns={[
               { title: '标题', dataIndex: 'title', render: (value, record) => <Link to={`/tickets/${record.id}`}>{value}</Link> },

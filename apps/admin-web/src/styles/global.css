@@ -58,6 +58,10 @@ body {
   padding: 22px;
 }
 
+.app-breadcrumb {
+  margin-bottom: 12px;
+}
+
 .page-toolbar {
   display: flex;
   align-items: flex-end;

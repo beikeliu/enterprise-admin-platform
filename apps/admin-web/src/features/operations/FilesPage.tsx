@@ -3,6 +3,7 @@ import { ExternalLink, Plus } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 type FileRow = {
   id: string;
@@ -69,6 +70,7 @@ export function FilesPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={items}
+            scroll={tableScroll()}
             columns={[
               {
                 title: '文件名',

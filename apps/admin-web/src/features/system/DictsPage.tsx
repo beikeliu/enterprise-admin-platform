@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { compactTableScroll, tableScroll } from '@/lib/table-scroll';
 
 type DictRow = {
   id: string;
@@ -59,6 +60,7 @@ export function DictsPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={data?.items ?? []}
+            scroll={tableScroll()}
             expandable={{
               expandedRowRender: (record: DictRow) => (
                 <Table
@@ -66,6 +68,7 @@ export function DictsPage() {
                   size="small"
                   pagination={false}
                   dataSource={record.items}
+                  scroll={compactTableScroll}
                   columns={[
                     { title: '标签', dataIndex: 'label' },
                     { title: '值', dataIndex: 'value' },

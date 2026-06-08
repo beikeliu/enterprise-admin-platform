@@ -2,6 +2,7 @@ import { Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Table, 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 type MenuRow = {
   id: string;
@@ -50,6 +51,7 @@ export function MenusPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={data?.items ?? []}
+            scroll={tableScroll()}
             columns={[
               { title: '名称', dataIndex: 'name' },
               { title: '路径', dataIndex: 'routePath' },

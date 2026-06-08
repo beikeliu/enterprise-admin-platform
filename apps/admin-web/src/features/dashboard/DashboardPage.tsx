@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { compactTableScroll } from '@/lib/table-scroll';
 
 const statusColor: Record<string, string> = {
   draft: 'default',
@@ -101,6 +102,7 @@ export function DashboardPage() {
               rowKey="id"
               title={() => '最近工单'}
               dataSource={ticketData?.items ?? []}
+              scroll={compactTableScroll}
               pagination={false}
               columns={[
                 { title: '标题', dataIndex: 'title', render: (value, record) => <Link to={`/tickets/${record.id}`}>{value}</Link> },

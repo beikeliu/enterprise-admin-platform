@@ -2,6 +2,7 @@ import { Bar, Gauge } from '@ant-design/plots';
 import { Table, Tag } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 const formatBytes = (value: number) => {
   if (value >= 1024 * 1024) return `${(value / 1024 / 1024).toFixed(1)} MB`;
@@ -73,6 +74,7 @@ export function SystemMonitorPage() {
             loading={isLoading}
             title={() => '最近审计活动'}
             dataSource={data?.recentAuditLogs ?? []}
+            scroll={tableScroll('calc(100vh - 620px)')}
             pagination={false}
             columns={[
               { title: '动作', dataIndex: 'action', width: 180, render: (value) => <Tag color="processing">{value}</Tag> },

@@ -2,6 +2,7 @@ import { Button, Space, Table, message } from 'antd';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 export function WorkflowTasksPage() {
   const queryClient = useQueryClient();
@@ -31,6 +32,7 @@ export function WorkflowTasksPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={data ?? []}
+            scroll={tableScroll()}
             columns={[
               { title: '工单标题', render: (_, record) => <Link to={`/tickets/${record.ticket.id}`}>{record.ticket.title}</Link> },
               { title: '申请人', render: (_, record) => record.ticket.applicantName },

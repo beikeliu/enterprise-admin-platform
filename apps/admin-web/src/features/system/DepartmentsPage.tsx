@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 type DepartmentRow = {
   id: string;
@@ -97,6 +98,7 @@ export function DepartmentsPage() {
               rowKey="id"
               loading={isLoading}
               dataSource={visibleRows}
+              scroll={tableScroll()}
               pagination={false}
               columns={[
                 { title: '名称', dataIndex: 'name' },

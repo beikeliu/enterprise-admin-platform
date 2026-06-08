@@ -2,6 +2,7 @@ import { Input, Table, Tag, Typography } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 type AuditLogRow = {
   id: string;
@@ -43,6 +44,7 @@ export function AuditLogsPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={((data as { items?: AuditLogRow[] } | undefined)?.items ?? [])}
+            scroll={tableScroll()}
             expandable={{
               expandedRowRender: (record) => (
                 <Typography.Text code style={{ whiteSpace: 'pre-wrap' }}>

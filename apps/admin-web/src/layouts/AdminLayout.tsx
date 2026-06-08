@@ -1,4 +1,4 @@
-import { Layout, Menu, Button, Avatar, Space } from 'antd';
+import { Layout, Menu, Button, Avatar, Space, Breadcrumb } from 'antd';
 import {
   ClipboardList,
   GitPullRequest,
@@ -20,10 +20,27 @@ const icons = {
   ShieldCheck: <ShieldCheck size={18} />,
 };
 
+const routeLabels: Array<{ pattern: RegExp; label: string }> = [
+  { pattern: /^\/tickets\/new$/, label: '新建工单' },
+  { pattern: /^\/tickets\/[^/]+$/, label: '工单详情' },
+  { pattern: /^\/workflow\/kanban$/, label: '任务看板' },
+  { pattern: /^\/workflow\/templates$/, label: '流程模板' },
+  { pattern: /^\/workflow\/tasks$/, label: '审批任务' },
+  { pattern: /^\/system\/monitor$/, label: '系统监控' },
+];
+
 export function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, menus, clear } = useAuthStore();
+  const selectedMenu = findSelectedMenu(menus, location.pathname);
+  const selectedKey = selectedMenu?.path;
+  const leafLabel = routeLabels.find((item) => item.pattern.test(location.pathname))?.label;
+  const breadcrumbItems = [
+    { title: '首页' },
+    ...(selectedMenu ? [{ title: selectedMenu.title }] : []),
+    ...(leafLabel && leafLabel !== selectedMenu?.title ? [{ title: leafLabel }] : []),
+  ];
 
   return (
     <Layout className="app-shell">
@@ -35,7 +52,7 @@ export function AdminLayout() {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[location.pathname]}
+          selectedKeys={selectedKey ? [selectedKey] : []}
           items={menus.map((item) => ({
             key: item.path,
             icon: icons[item.icon as keyof typeof icons],
@@ -63,9 +80,18 @@ export function AdminLayout() {
           </Space>
         </Header>
         <Content className="app-content">
+          <Breadcrumb className="app-breadcrumb" items={breadcrumbItems} />
           <Outlet />
         </Content>
       </Layout>
     </Layout>
   );
+}
+
+function findSelectedMenu(menus: Array<{ path: string; title: string }>, pathname: string) {
+  const exact = menus.find((item) => item.path === pathname);
+  if (exact) return exact;
+  return menus
+    .filter((item) => pathname === item.path || pathname.startsWith(`${item.path}/`))
+    .sort((a, b) => b.path.length - a.path.length)[0];
 }

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { getChinaDateKey } from '@/lib/datetime';
+import { tableScroll } from '@/lib/table-scroll';
 
 type NotificationRow = {
   id: string;
@@ -71,6 +72,7 @@ export function NotificationsPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={items}
+            scroll={tableScroll()}
             expandable={{
               expandedRowRender: (record) => (
                 <Typography.Paragraph style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{record.content}</Typography.Paragraph>

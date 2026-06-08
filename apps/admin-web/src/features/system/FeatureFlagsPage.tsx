@@ -1,6 +1,7 @@
 import { Input, Space, Switch, Table, Tag, message } from 'antd';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 type FeatureFlagRow = {
   id: string;
@@ -38,6 +39,7 @@ export function FeatureFlagsPage() {
             rowKey="id"
             loading={isLoading}
             dataSource={data?.items ?? []}
+            scroll={tableScroll()}
             columns={[
               { title: '名称', dataIndex: 'name' },
               { title: '编码', dataIndex: 'code', width: 190 },

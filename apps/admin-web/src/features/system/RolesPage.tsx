@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { tableScroll } from '@/lib/table-scroll';
 
 type RoleRow = {
   id: string;
@@ -103,6 +104,7 @@ export function RolesPage() {
               rowKey="id"
               loading={isLoading}
               dataSource={roles}
+              scroll={tableScroll()}
               columns={[
                 { title: '角色', dataIndex: 'name' },
                 { title: '编码', dataIndex: 'code', width: 160 },
@@ -142,7 +144,7 @@ export function RolesPage() {
               size="small"
               loading={isLoading}
               dataSource={matrixRows}
-              scroll={{ x: Math.max(980, 320 + roles.length * 150), y: 560 }}
+              scroll={{ x: Math.max(980, 320 + roles.length * 150), y: 'calc(100vh - 360px)' }}
               pagination={false}
               columns={[
                 { title: '资源', dataIndex: 'resource', width: 150, fixed: 'left' },
@@ -182,8 +184,9 @@ export function RolesPage() {
         onOk={() => assignMutation.mutate()}
         confirmLoading={assignMutation.isPending}
         width={820}
+        styles={{ body: { maxHeight: 'calc(100vh - 220px)', overflowY: 'auto' } }}
       >
-        <Space direction="vertical" size={18} style={{ width: '100%', maxHeight: 520, overflow: 'auto' }}>
+        <Space direction="vertical" size={18} style={{ width: '100%' }}>
           {permissionGroups.map(([resource, options]) => (
             <div key={resource}>
               <strong>{resource}</strong>
@@ -204,6 +207,7 @@ export function RolesPage() {
         onOk={() => createForm.submit()}
         confirmLoading={createMutation.isPending}
         width={820}
+        styles={{ body: { maxHeight: 'calc(100vh - 220px)', overflowY: 'auto' } }}
       >
         <Form
           form={createForm}
@@ -226,7 +230,7 @@ export function RolesPage() {
           </Form.Item>
           <Form.Item name="permissionCodes" label="权限">
             <Checkbox.Group style={{ width: '100%' }}>
-              <Space direction="vertical" size={18} style={{ width: '100%', maxHeight: 420, overflow: 'auto' }}>
+              <Space direction="vertical" size={18} style={{ width: '100%' }}>
                 {permissionGroups.map(([resource, options]) => (
                   <div key={resource}>
                     <strong>{resource}</strong>
